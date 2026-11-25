@@ -27,3 +27,7 @@
 ## 0.2.5 - 2026-11-25
 
 - Fix `/decision-model <partial>`: the prefill now goes through the component's own input path (identical to typing), so dynamic filtering works and the cursor starts at the end of the term (v0.2.4's ctrl+e trick was defeated by the app's keybinding manager).
+
+## 0.2.6 - 2026-11-25
+
+- Fix: the v0.2.4/v0.2.5 prefill patches were dead code (constructor result was returned directly, so the prefill statements never ran). `/decision-model <partial>` now genuinely prefills the search box by typing through the component; dynamic filtering works as you type.

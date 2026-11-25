@@ -214,24 +214,24 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 						getError: () => undefined,
 						refresh: async ({ signal }: { signal?: AbortSignal }) => ({ aborted: signal?.aborted ?? false, errors: new Map() }),
 					};
-					return new ModelSelectorComponent(
-						tui,
-						current,
-						adapter as never,
-						[] as never,
-						(model) => done({ model, asDefault: false }),
-						() => done(undefined),
-						undefined,
-						(model) => done({ model, asDefault: true }),
-						defaultRef,
-					);
-				// Prefill by typing through the component itself — identical to real
+					const selector = new ModelSelectorComponent(
+					tui,
+					current,
+					adapter as never,
+					[] as never,
+					(model) => done({ model, asDefault: false }),
+					() => done(undefined),
+					undefined,
+					(model) => done({ model, asDefault: true }),
+					defaultRef,
+				);
+				// Prefill by typing through the component itself - identical to real
 				// typing: input starts empty (cursor at 0, no mis-insertion), the term
 				// is forwarded to the search input, and the list re-filters live.
 				if (searchTerm) selector.handleInput(searchTerm);
 				return selector;
-				},
-			);
+			},
+		);
 
 			if (picked) select(picked.model, picked.asDefault);
 		},
