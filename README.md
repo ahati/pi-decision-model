@@ -62,7 +62,7 @@ List everything with `models.getAvailableOfType("classifier")`, or pick interact
 
 `/decision-model` mirrors `/model` for decision models:
 
-- `/decision-model` — opens the same search picker (fuzzy filter, arrow keys, Enter) over every decision model pi knows, e.g. `opencode-go/jev-1.14` or `openrouter/typesafe/jev-1.14`.
+- `/decision-model` — opens the same search picker (fuzzy filter, arrow keys, Enter) over decision models from your **enabled providers** (resolved from `enabledModels` / `--models`, same scoping `/scoped-models` uses). With the default OpenCode Go setup that's `opencode-go/jev-1.14`, `gemini-decision-1`, and `gpt-6-luna-decision`; add patterns like `"openrouter/*"` to `enabledModels` to see more.
 - `/decision-model opencode-go/jev-1.14` — exact match selects immediately, like `/model provider/id`.
 - **Enter** selects for the session; **ctrl+s** saves as default (restored on every session start); **Esc** cancels.
 - The current choice persists in `~/.pi/agent/decision-model.json` and shows in the footer status bar as `dm: provider/id`.
