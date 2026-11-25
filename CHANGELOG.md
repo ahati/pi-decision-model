@@ -23,3 +23,7 @@
 ## 0.2.4 - 2026-11-25
 
 - Fix `/decision-model <partial>` prefill: the search cursor now starts at the end of the prefilled term, so typing appends (previously characters were inserted at position 0, garbling the query).
+
+## 0.2.5 - 2026-11-25
+
+- Fix `/decision-model <partial>`: the prefill now goes through the component's own input path (identical to typing), so dynamic filtering works and the cursor starts at the end of the term (v0.2.4's ctrl+e trick was defeated by the app's keybinding manager).
