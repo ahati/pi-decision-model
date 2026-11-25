@@ -69,6 +69,13 @@ List everything with `models.getAvailableOfType("classifier")`, or pick interact
 
 The picker reuses pi's own model selector component, so the UX is identical to `/model`.
 
+**Footer status line** — off by default. To show the current decision model in the status bar, set:
+
+```json
+// ~/.pi/agent/decision-model.json
+{ "showStatus": true }
+```
+
 ## How it works
 
 pi's `models.json` loader silently drops model `type`, so decision models can only be declared by provider code — there is no configuration-only way to add them (see [pi discussion #10950](https://github.com/earendil-works/pi/discussions/10950) for the same limitation). This extension:

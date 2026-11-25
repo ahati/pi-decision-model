@@ -7,3 +7,7 @@
 ## 0.2.0 - 2026-11-25
 
 - Add `/decision-model [provider/id|search]`: picker with the same UX as `/model` (fuzzy search, Enter to select, ctrl+s to save as default). Selection persists in `~/.pi/agent/decision-model.json` and shows in the footer status bar.
+
+## 0.2.1 - 2026-11-25
+
+- The `dm: provider/id` footer status line is now **off by default**. Enable it with `"showStatus": true` in `~/.pi/agent/decision-model.json`.

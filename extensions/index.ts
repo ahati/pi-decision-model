@@ -86,6 +86,8 @@ interface ModelRef {
 interface DecisionModelState {
 	default?: ModelRef;
 	session?: ModelRef;
+	/** Set true to render `dm: provider/id` in the footer status bar. Default: off. */
+	showStatus?: boolean;
 }
 
 function loadState(): DecisionModelState {
@@ -131,14 +133,16 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 		},
 	});
 
-	const setStatusLine = (ctx: { ui: { setStatus(key: string, text: string | undefined): void } }, ref: ModelRef | undefined) => {
-		ctx.ui.setStatus("decision-model", ref ? `dm: ${ref.provider}/${ref.id}` : undefined);
+	const setStatusLine = (ctx: { ui: { setStatus(key: string, text: string | undefined): void } }, state: DecisionModelState) => {
+		// Opt-in via "showStatus": true in ~/.pi/agent/decision-model.json.
+		if (state.showStatus !== true) return;
+		ctx.ui.setStatus("decision-model", state.session ? `dm: ${state.session.provider}/${state.session.id}` : undefined);
 	};
 
 	pi.on("session_start", async (_event, ctx) => {
 		const state = loadState();
 		if (!state.session && state.default) state.session = state.default;
-		setStatusLine(ctx, state.session);
+		setStatusLine(ctx, state);
 	});
 
 	pi.registerCommand("decision-model", {
@@ -159,7 +163,7 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 				state.session = ref;
 				if (asDefault) state.default = ref;
 				saveState(state);
-				setStatusLine(ctx, ref);
+				setStatusLine(ctx, state);
 				ctx.ui.notify(asDefault ? `Default decision model: ${ref.provider}/${ref.id}` : `Decision model: ${ref.id}`, "info");
 			};
 
