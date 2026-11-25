@@ -97,3 +97,7 @@ pi remove git:github.com/ahati/pi-decision-model
 ## License
 
 [MIT](LICENSE)
+
+## The `classify` tool
+
+The extension also registers a **`classify` tool** so the agent uses your selection without touching the raw registry (which lists every classifier from every configured provider — that's pi's inventory, by design). The tool defaults to the `/decision-model` selection; pass `model: "provider/id"` to override for a single call.
