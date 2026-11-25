@@ -1,6 +1,6 @@
 {
   "name": "pi-decision-model",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Pi extension that adds OpenCode Go decision models (jev-1.14, gemini-decision-1, gpt-6-luna-decision) to the opencode-go provider, alongside its existing chat models.",
   "license": "MIT",
   "author": "ahati",

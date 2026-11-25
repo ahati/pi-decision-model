@@ -15,3 +15,7 @@
 ## 0.2.2 - 2026-11-25
 
 - `/decision-model` picker now renders inline in the bottom dock (same slot as `/model`) instead of a floating overlay popup.
+
+## 0.2.3 - 2026-11-25
+
+- `/decision-model` picker now only shows decision models from **enabled providers** (resolved from `enabledModels` / `--models` scoping). Falls back to all configured providers when no scoping is set. Exact `provider/id` arguments still address any available decision model.

@@ -150,8 +150,17 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 		handler: async (args: string, ctx) => {
 			const classifiers = await ctx.modelRegistry.getAvailableOfType("classifier");
 
-			if (classifiers.length === 0) {
-				ctx.ui.notify("No decision models available. Configure a provider that serves them (e.g. OpenCode Go with pi-decision-model).", "warning");
+			// Scope to enabled providers (resolved from `enabledModels` / --models via
+			// ctx.scopedModels), mirroring how /scoped-models narrows chat models. When
+			// no scoping is configured, all classifier-capable providers are shown.
+			const enabledProviders = new Set(ctx.scopedModels.map((scoped) => scoped.model.provider));
+			const visible = enabledProviders.size > 0 ? classifiers.filter((m) => enabledProviders.has(m.provider)) : classifiers;
+
+			if (visible.length === 0) {
+				ctx.ui.notify(
+					`No decision models from enabled providers (${classifiers.length} available from: ${[...new Set(classifiers.map((m) => m.provider))].join(", ")}). Add patterns like "opencode-go/*" to enabledModels to include them.`,
+					"warning",
+				);
 				return;
 			}
 
@@ -170,7 +179,8 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 			const searchTerm = args.trim();
 
 			// Mirror /model: an exact provider/id (or unique id) match selects
-			// immediately without opening the picker.
+			// immediately without opening the picker. Explicit references may
+			// address any available decision model, enabled or not.
 			if (searchTerm) {
 				const needle = searchTerm.toLowerCase();
 				const exact = classifiers.filter(
@@ -199,7 +209,7 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 			const picked = await ctx.ui.custom<{ model: (typeof classifiers)[number]; asDefault: boolean } | undefined>(
 				(tui, _theme, _keybindings, done) => {
 					const adapter = {
-						getAvailableSnapshot: () => classifiers,
+						getAvailableSnapshot: () => visible,
 						getModel: () => undefined,
 						getError: () => undefined,
 						refresh: async ({ signal }: { signal?: AbortSignal }) => ({ aborted: signal?.aborted ?? false, errors: new Map() }),
