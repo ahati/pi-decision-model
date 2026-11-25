@@ -225,6 +225,11 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 						(model) => done({ model, asDefault: true }),
 						defaultRef,
 					);
+					// The component prefills the search text but leaves the Input cursor at 0
+					// (setValue keeps cursor via Math.min(cursor, len)), so typed characters
+					// would insert at the start. Jump to end (ctrl+e) after prefill.
+					if (searchTerm) selector.getSearchInput().handleInput("\x05");
+					return selector;
 				},
 			);
 

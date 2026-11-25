@@ -19,3 +19,7 @@
 ## 0.2.3 - 2026-11-25
 
 - `/decision-model` picker now only shows decision models from **enabled providers** (resolved from `enabledModels` / `--models` scoping). Falls back to all configured providers when no scoping is set. Exact `provider/id` arguments still address any available decision model.
+
+## 0.2.4 - 2026-11-25
+
+- Fix `/decision-model <partial>` prefill: the search cursor now starts at the end of the prefilled term, so typing appends (previously characters were inserted at position 0, garbling the query).
