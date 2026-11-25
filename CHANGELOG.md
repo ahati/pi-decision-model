@@ -11,3 +11,7 @@
 ## 0.2.1 - 2026-11-25
 
 - The `dm: provider/id` footer status line is now **off by default**. Enable it with `"showStatus": true` in `~/.pi/agent/decision-model.json`.
+
+## 0.2.2 - 2026-11-25
+
+- `/decision-model` picker now renders inline in the bottom dock (same slot as `/model`) instead of a floating overlay popup.

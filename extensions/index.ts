@@ -195,6 +195,7 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 			const current = classifiers.find((m) => refKey(m) === refKey(state.session));
 			const defaultRef = state.default ? { provider: state.default.provider, id: state.default.id } : undefined;
 
+			// Inline mount (bottom dock, same slot /model uses) - not an overlay popup.
 			const picked = await ctx.ui.custom<{ model: (typeof classifiers)[number]; asDefault: boolean } | undefined>(
 				(tui, _theme, _keybindings, done) => {
 					const adapter = {
@@ -215,7 +216,6 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 						defaultRef,
 					);
 				},
-				{ overlay: true, blocked: { kind: "question", message: "Select decision model" } },
 			);
 
 			if (picked) select(picked.model, picked.asDefault);
