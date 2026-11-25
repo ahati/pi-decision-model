@@ -31,3 +31,7 @@
 ## 0.2.6 - 2026-11-25
 
 - Fix: the v0.2.4/v0.2.5 prefill patches were dead code (constructor result was returned directly, so the prefill statements never ran). `/decision-model <partial>` now genuinely prefills the search box by typing through the component; dynamic filtering works as you type.
+
+## 0.3.0 - 2026-11-25
+
+- Add a `classify` tool that uses the decision model selected with `/decision-model` by default (override with the `model: "provider/id"` parameter). This gives the selection a real consumer: the agent no longer picks among every classifier in the registry — it calls `classify` and the selected model is used.

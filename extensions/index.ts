@@ -27,6 +27,7 @@
 import { ModelSelectorComponent } from "@earendil-works/pi-coding-agent";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { builtinProviders, getBuiltinModels } from "@earendil-works/pi-ai/providers/all";
+import { Type } from "typebox";
 import { readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -234,6 +235,66 @@ export default function piDecisionModel(pi: ExtensionAPI): void {
 		);
 
 			if (picked) select(picked.model, picked.asDefault);
+		},
+	});
+
+	// Give the selection a consumer: a `classify` tool that defaults to the
+	// decision model chosen with /decision-model (override via `model`).
+	// codemode's models.getAvailableOfType intentionally lists the whole
+	// registry; this tool is the opinionated entry point.
+	const textResult = (text: string, isError = false) => ({ content: [{ type: "text" as const, text }], isError });
+
+	pi.registerTool({
+		name: "classify",
+		label: "Classify (decision model)",
+		description:
+			"Classify JSON state with typed questions (bool / choice / score) using the decision model selected via /decision-model. " +
+			"Each question: { type, instructions, criteria } where criteria maps labels to meanings (bool: {true,false}; choice: label map; score: ordered levels lowest-first). " +
+			"Returns per-question answers with probabilities and confidence. Pass `model` as 'provider/id' to override the selection.",
+		promptSnippet: "classify: typed decisions (bool/choice/score with probabilities) using the selected decision model",
+		parameters: Type.Object({
+			state: Type.Unknown({ description: "JSON-serializable state to classify" }),
+			questions: Type.Record(Type.String(), Type.Any(), {
+				description: 'Question id \u2192 { type: "bool" | "choice" | "score", instructions, criteria }',
+			}),
+			model: Type.Optional(Type.String({ description: "Override decision model as 'provider/id'" })),
+		}),
+		async execute(_toolCallId, params, signal, _onUpdate, ctx) {
+			const override = typeof params.model === "string" ? params.model.trim() : "";
+			let provider: string | undefined;
+			let id: string | undefined;
+
+			if (override) {
+				const slash = override.indexOf("/");
+				if (slash <= 0) return textResult(`Invalid model '${override}'. Use 'provider/id'.`, true);
+				provider = override.slice(0, slash);
+				id = override.slice(slash + 1);
+			} else {
+				const state = loadState();
+				const ref = state.session ?? state.default;
+				if (!ref) {
+					return textResult("No decision model selected. Run /decision-model, or pass `model` as 'provider/id'.", true);
+				}
+				provider = ref.provider;
+				id = ref.id;
+			}
+
+			const model = ctx.modelRegistry.getModelOfType("classifier", provider, id);
+			if (!model) return textResult(`Decision model ${provider}/${id} is not available.`, true);
+
+			const result = await ctx.modelRegistry.classify(
+				model,
+				{ state: params.state as Record<string, unknown>, questions: params.questions as Record<string, never> },
+				{ signal },
+			);
+
+			const payload = {
+				model: `${provider}/${id}`,
+				stopReason: result.stopReason,
+				answers: result.answers,
+				...(result.errorMessage ? { errorMessage: result.errorMessage } : {}),
+			};
+			return textResult(JSON.stringify(payload), result.stopReason === "error");
 		},
 	});
 }
